@@ -1,0 +1,34 @@
+- name: Copy hosts file
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    force: yes
+vicky:k8s mac$ cat kubernetes-dashboard-tasks-main.yaml
+- name: Copy kubernetes-dashboard.yaml manifests
+  template:
+    src: kubernetes-dashboard.yaml.j2
+    dest: /tmp/kubernetes-dashboard.yaml
+    force: yes
+
+- name: copy service account config of dashboard-user
+  copy:
+    src: /opt/k8s-playbooks/playbooks/roles/kubernetes-dashboard/templates/dashboars-user.yaml
+    dest: /tmp/dashboard-user.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: copy service account ClusterRoleBinding config
+  copy:
+    src: /opt/k8s-playbooks/playbooks/roles/kubernetes-dashboard/templates/admin-user-binding.yaml
+    dest: /tmp/admin-user-binding.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create kubernetes-dashboard Deployment
+  shell: kubectl apply -f "{{ item }}"
+  with_items:
+    - /tmp/kubernetes-dashboard.yaml
+    - /tmp/dashboard-user.yaml
+    - /tmp/admin-user-binding.yaml
