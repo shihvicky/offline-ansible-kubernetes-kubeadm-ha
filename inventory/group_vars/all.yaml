@@ -1,0 +1,21 @@
+k8s_version: 1.17.2
+
+imageRepository: 88.249.30.157
+
+keepalived_VIP: 88.249.30.154
+keepalived_interface: ens192
+
+master01: dak8sm01
+master01_ip: 88.249.30.151
+
+master02: dak8sm02
+master02_ip: 88.249.30.152
+
+master03: dak8sm03
+master03_ip: 88.249.30.153
+
+workers01: dak8sw01
+workers01_ip: 88.249.30.155
+
+workers02: dak8sw02
+workers02_ip: 88.249.30.156
