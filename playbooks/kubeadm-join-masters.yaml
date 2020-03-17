@@ -1,0 +1,4 @@
+- hosts: k8s-master-replicas
+  serial: 1
+  roles:
+    - kubeadm-join-masters
