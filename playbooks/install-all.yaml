@@ -1,0 +1,12 @@
+- import_playbook: update-hosts.yaml
+- import_playbook: repos.yaml
+- import_playbook: crio.yaml
+- import_playbook: install-haproxy.yaml
+- import_playbook: install-keepalived.yaml
+- import_playbook: kubeadm-prerequisite.yaml
+- import_playbook: kubeadm-init-master.yaml
+- import_playbook: flannel.yaml
+- import_playbook: kubeadm-join-masters.yaml
+- import_playbook: kubeadm-join-workers.yaml
+- import_playbook: kubernetes-dashboard.yaml
+- import_playbook: helm-install.yaml
