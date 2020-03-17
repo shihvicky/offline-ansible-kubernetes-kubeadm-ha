@@ -1,0 +1,4 @@
+- hosts: k8s-masters
+  become: yes
+  roles:
+    - install-keepalived
