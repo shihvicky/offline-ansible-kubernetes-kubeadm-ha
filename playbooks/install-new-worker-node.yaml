@@ -1,0 +1,42 @@
+---
+- hosts: "{{groups['k8s-workers'][0]}}"
+
+  tasks:
+
+  - name: copy /etc/hosts from worker01 to new added worker
+    copy:
+      src: /etc/hosts
+      dest: /tmp
+    delegate_to: "{{groups['new-worker-node'][0]}}"
+
+- hosts: "{{groups['new-worker-node'][0]}}"
+
+  tasks:
+
+  - name: check "{{groups['new-worker-node'][0]}}" in hosts or not
+    lineinfile"
+      path: /tmp/hosts
+      line: "{{ new_worker_ip }}	{{ groups['new-worker-node'][0] }}.example.com {{ groups['new-worker-node'][0] }} worker03"
+      state: present
+      create: yes
+
+  - name: move hosts to /etc
+    shell: mv /tmp/hosts /etc/hosts
+
+- hosts: k8s-nodes
+
+  tasks:
+
+  - name: check "{{groups['new-worker-node'][0]}}" in /etc/hosts or not
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ new_worker_ip }}	{{ groups['new-worker-node'][0] }}.example.com {{ groups['new-worker-node'][0] }} worker03"
+      state: present
+      create: yes
+
+- hosts: "{{ target }}"
+
+- import_playbook: repos.yaml
+- import_playbook: crio.yaml
+- import_playbook: kubeadm-prerequisite.yaml
+- import_playbook: kubeadm-join-workers.yaml
