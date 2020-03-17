@@ -1,0 +1,5 @@
+- hosts: "{{ target_worker }}"
+  serial: 1
+  become: yes
+  roles:
+    - kubeadm-join-workers
