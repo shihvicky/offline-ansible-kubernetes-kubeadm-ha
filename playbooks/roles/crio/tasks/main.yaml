@@ -1,0 +1,20 @@
+- name: untar crio.tar
+  unarchive:
+    src: /opt/k8s-playbooks/source/crio.tar
+    dest: /
+    
+- name: config insecure registry in /etc/containers/registries.conf
+  template:
+    src: registries.conf.j2
+    dest: /etc/containers/registries.conf
+    
+- name: change pause image url in /etc/crio.conf
+  template:
+    src: crio.conf.j2
+    dest: /etc/crio/crio.conf
+
+- name: start cri-o
+  systemd:
+    state: started
+    name: cri-o
+    enabled: yes
