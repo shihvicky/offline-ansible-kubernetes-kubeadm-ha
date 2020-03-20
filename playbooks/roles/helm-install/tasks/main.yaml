@@ -1,0 +1,23 @@
+- name: Helm download and install
+  copy:
+    src: /opt/k8s-playbooks/source/helm
+    dest: /usr/local/bin/helm
+    mode: '0755'
+    owner: root
+    
+- name: create charts directory under /opt
+  shell: mkdir /opt/charts
+  
+- name: untar kube-state-metrics and metrics-server chart
+  unarchive:
+    src: /opt/k8s-playbooks/source/{{ item }}
+    dest: /opt/charts
+  with_items:
+    - helm-metrics-server-0.3.6.tar
+    - helm-kube-state-metrics.tar
+    
+- name: install metrics server helm chart
+  shell: /usr/local/bin/helm install {{ item }} /opt/charts/{{ item }}
+  with_items:
+    - metrics-server
+    - kube-state-metrics
