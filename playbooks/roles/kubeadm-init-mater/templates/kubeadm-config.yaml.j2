@@ -1,0 +1,7 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: v{{ k8s_version }}
+controlPlaneEndpoint: "{{ keepalived_VIP }}:8443"
+networking:
+  podSubnet: 10.244.0.0/16
+imageRepository: 88.249.30.157/k8s-{{ k8s_version }}
