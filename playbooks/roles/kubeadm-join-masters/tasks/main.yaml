@@ -1,0 +1,22 @@
+- name: Create kubernetes folders
+  file:
+    path: /etc/kubernetes/pki/etcd
+    state: directory
+    mode: 0640
+    owner: root
+    group: root
+  
+- name: Generate master join token
+  shell: kubeadm token create --print-join-command
+  register: kubeadm_join_command
+  delegate_to: "{{groups['k8s-master-primary'][0]}}"
+  
+- set_fact:
+    kubeadm_join: "{{ kubeadm_join_cmd.stdoud }}"
+    
+- name: get certificate-key
+  shell: kubeadm init phase upload-certs --upload-certs
+  register: certs
+  
+- name: Join master replicas to cluster
+  shell: "{{ kubeadm_join }} --control-plane --certificate-key {{ certs.stdout_lines[2] }}"
