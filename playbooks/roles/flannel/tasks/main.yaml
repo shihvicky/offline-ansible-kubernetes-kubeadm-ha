@@ -1,0 +1,13 @@
+- name: restart haproxy
+  systemd:
+    name: haproxy
+    state: restarted
+    
+- name: Copy flannel.yam mainifests
+  template:
+    src: kube-flannel.yaml.j2
+    dest: /tmp/kube-flannel.yaml
+    force: yes
+    
+- name: create Flannel Deployment
+  shell: kubectl apply -f /tmp/kube-flannel.yaml
