@@ -1,0 +1,63 @@
+! Configuration File for keepalived
+
+ 
+
+global_defs {
+
+   router_id LVS_DEVEL
+
+}
+
+ 
+
+vrrp_script check_haproxy {
+
+    script "killall -0 haproxy"
+
+    interval 3
+
+    weight -2
+
+    fall 10
+
+    rise 2
+
+}
+
+ 
+
+vrrp_instance VI_1 {
+
+    state {{ keepalived_state }}
+
+    interface {{ keepalived_interface }}
+
+    virtual_router_id 51
+
+    priority {{ keepalived_priority }}
+
+    advert_int 1
+
+    authentication {
+
+        auth_type PASS
+
+        auth_pass 35f18af7190d51c9f7f78f37300a0cbd
+
+    }
+
+ 
+
+    virtual_ipaddress {
+
+        {{ keepalived_VIP }}
+
+    }
+
+    track_script {
+
+        check_haproxy
+
+    }
+
+}
