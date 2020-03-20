@@ -1,0 +1,17 @@
+- name: Install keepalived
+  become: yes
+  yum:
+    name: keepalived
+    enablerepo: k8s-repo
+    state: present
+   
+- name: setup keepalived config
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    
+- name: start keepalived
+  systemd:
+    name: keepalived
+    state: started
+    enabled: true
