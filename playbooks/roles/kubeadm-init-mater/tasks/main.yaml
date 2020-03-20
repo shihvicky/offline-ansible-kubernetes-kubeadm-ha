@@ -1,0 +1,135 @@
+- name: "Create kubeadm init config yaml"
+
+  template:
+
+    src: kubeadm-config.yaml.j2
+
+    dest: /tmp/kubeadm-config.yaml
+
+    mode: 0644
+
+ 
+
+- name: restart haproxy and keepalived
+
+  shell: "systemctl restart \"{{ item }}\"; sleep 10"
+
+  with_items:
+
+    - haproxy
+
+    - keepalived
+
+ 
+
+- name: wait for port 8443 become LISTEN state
+
+  wait_for:
+
+    port: 8443
+
+    delay: 10
+
+    timeout: 30
+
+ 
+
+- name: Kubeadm init
+
+  shell: kubeadm init --cri-socket=/var/run/crio/crio.sock --config=/tmp/kubeadm-config.yaml --upload-certs --v=5 > /tmp/kubeadm.log
+
+  register: rslt
+
+  ignore_errors: yes
+
+ 
+
+- name: Store init output
+
+  action: copy content="{{ rslt.stdout }}" dest="/etc/kubernetes/kubeadm-init.stdout"
+
+ 
+
+- name: Create .kube folder
+
+  file:
+
+    path: "/root/.kube"
+
+    state: directory
+
+    owner: "root"
+
+ 
+
+- name: Copy admin.conf to .kube folder
+
+  copy:
+
+    src: /etc/kubernetes/admin.conf
+
+    dest: "/root/.kube/config"
+
+    owner: "root"
+
+    remote_src: yes
+
+ 
+
+- name: "Fetching Kubernetes Master PKI files from primary master"
+
+  fetch:
+
+    src: /etc/kubernetes/pki/{{item}}
+
+    dest: /tmp/kubeadm-ha/pki/{{item}}
+
+    flat: yes
+
+  with_items:
+
+    - ca.crt
+
+    - ca.key
+
+    - sa.key
+
+    - sa.pub
+
+    - front-proxy-ca.crt
+
+    - front-proxy-ca.key
+
+ 
+
+- name: "Fetching Kubernetes Master ETCD files from primary master"
+
+  fetch:
+
+    src: /etc/kubernetes/pki/etcd/{{item}}
+
+    dest: /tmp/kubeadm-ha/pki/etcd/{{item}}
+
+    flat: yes
+
+  with_items:
+
+    - ca.crt
+
+    - ca.key
+
+ 
+
+- name: "Fetching Kubernetes Master Admin files from primary master"
+
+  fetch:
+
+    src: /etc/kubernetes/{{item}}
+
+    dest: /tmp/kubeadm-ha/{{item}}
+
+    flat: yes
+
+  with_items:
+
+    - admin.conf
