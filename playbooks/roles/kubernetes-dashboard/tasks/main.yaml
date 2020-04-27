@@ -1,0 +1,35 @@
+- name: Copy kubernetes-dashboard.yaml manifests
+  template:
+    src: kubernetes-dashboard.yaml.j2
+    dest: /tmp/kubernetes-dashboard.yaml
+    force: yes
+
+- name: copy service account config of dashboard-user
+  copy:
+    src: /opt/k8s-playbooks/playbooks/roles/kubernetes-dashboard/templates/dashboard-user.yaml
+    dest: /tmp/dashboard-user.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: copy service account ClusterRoleBinding config
+  copy:
+    src: /opt/k8s-playbooks/playbooks/roles/kubernetes-dashboard/templates/admin-user-binding.yaml
+    dest: /tmp/admin-user-binding.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create kubernetes-dashboard Deployment
+  shell: kubectl apply -f "{{ item }}"
+  with_items:
+    - /tmp/kubernetes-dashboard.yaml
+    - /tmp/dashboard-user.yaml
+    - /tmp/admin-user-binding.yaml
+
+- name: get service account token
+  shell: "kubectl describe secrets $(kubectl get secrets -n kube-system | grep \"admin-user\" | awk '{print $1}') -n kube-system | grep ^token | awk '{print $2}'"
+  register: admin_user_token
+
+- name: print connect url
+  shell: echo " dashboard URL':' https://{{ keepalived_VIP }}:30443/#/login  , login token is {{ admin_user_token }} " > ~root/k8s-login.txt
