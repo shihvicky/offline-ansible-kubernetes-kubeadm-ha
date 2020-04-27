@@ -1,0 +1,39 @@
+  - name: Create /etc/yum.repos.d/orig if it does not exist
+    file:
+      path: /etc/yum.repos.d/orig
+      state: directory
+      mode: '0755'
+
+  - name: move /etc/yum.repos.d/CentOS-*.repo to /etc/yum.repos.d/orig
+    shell: mv /etc/yum.repos.d/CentOS-*.repo /etc/yum.repos.d/orig
+
+  - name: set RHEL 7 repo
+    yum_repository:
+      name: rhel-7-server-rpms
+      description: RHEL 7 yum repo
+      baseurl: http://88.8.196.120/repo/rhel-7-server-rpms/
+      gpgcheck: no
+
+  - name: install some packages
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - bash-completion
+      - net-tools
+      - lsof
+      - unzip
+      - nc
+
+  - name: setup root profile for bash-completion
+    lineinfile:
+      path: ~root/.bash_profile
+      line: 'source <(kubectl completion bash)'
+
+  - name: set k8s repo
+    yum_repository:
+      name: k8s-repo
+      description: k8s {{ k8s_version }} repo
+      baseurl: http://88.8.196.120/repo/k8s/{{ k8s_version }}/
+      gpgcheck: no
+      enabled: yes
