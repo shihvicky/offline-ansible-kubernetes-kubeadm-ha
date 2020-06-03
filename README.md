@@ -1,8 +1,8 @@
-這個 repository 的目的，是在於如何在不能直接連上 Internet 的環境下，透過 kubeadm 安裝 Kubernetes cluster
+這個 repository 裡的 playbook，是給 CentOS 或 Red Hat 的主機使用。其目的在於如何在不能直接連上 Internet 的環境下，透過 kubeadm 安裝 Kubernetes cluster 。
 
 (需要直接於 Internet 上透過 Ansible playbooks 安裝 Kubernetes cluster 的，請右轉至 https://github.com/MnrGreg/ansible-kubernetes-kubeadm-ha )
 
-這個 repository 裡的 playbook，是給 CentOS 或 Red Hat 的主機使用。
+
 
 ## 事先準備工作: ##
 
